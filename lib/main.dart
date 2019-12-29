@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_note/models/model.dart';
 import 'package:toast/toast.dart';
 import 'pages/create_note.dart';
 
@@ -28,64 +29,72 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  var notesList;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
+  @override
+  void setState(fn) {
+    // TODO: implement setState
+    super.setState(fn);
+  }
+
+
+  Future<void> _getData() async {
+    var data = await Note().select().toList();
+    print("Counter........");
+    print(data.length);
+    setState((){
+      notesList = data;
     });
+    print(data.length);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      drawer: Drawer(
+      body: SafeArea(
         child: Column(
-          children: <Widget>[
-            UserAccountsDrawerHeader(
-              accountName: Text("Makamu Evans"),
-              accountEmail: Text("makamuevans@gmail.com"),
-              currentAccountPicture: CircleAvatar(
-                child: FlutterLogo(size: 42),
-                backgroundColor: Colors.white,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.blue
-              ),
-            ),
-            ListTile(
-              dense: true,
-              leading: Icon(Icons.sync, color: Colors.blue,),
-              title: Text("Sync Online"),
-              onTap: (){
-                Toast.show("You clicked on Sync", context, duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
-                Navigator.pop(context);
-              },
-            )
-          ],
-        ),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-          ],
-        ),
-      ),
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      "Notes",
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
+                ),
+                FutureBuilder<List>(
+                  future: Note().select().toList(),
+                  initialData: List(),
+                  builder: (context, snapshot){
+                    if (snapshot.hasData){
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                          itemBuilder: (_, int position){
+                            final item = snapshot.data[position];
+                            return Card(
+                              child: ListTile(
+                                title: Text(item.title),
+                              ),
+                            );
+                          }
+                      );
+                    } else {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                )
+              ],
+            )),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => NewNote()));
         },
         tooltip: 'Increment',
@@ -93,4 +102,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  Widget _buildRow(Note note){
+    return ListTile(
+      title: Text(
+        note.title
+      ),
+      trailing: Icon(
+        note.favourite ? Icons.favorite : Icons.favorite_border,
+        color: note.favourite ? Colors.red : null,
+      ),
+      onTap: () {
+
+      },
+    );
+  }
+
 }

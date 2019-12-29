@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:my_note/models/model.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 import 'package:toast/toast.dart';
 import 'dart:convert';
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart';
+import 'package:intl/intl.dart';
+
 
 class NewNote extends StatefulWidget {
   @override
@@ -69,6 +70,9 @@ class NewNoteState extends State<NewNote> {
                 _title = value;
                 FocusScope.of(context).requestFocus(_focusNode);
               },
+              onChanged: (value){
+                _title = value;
+              },
             ),
           ),
           Expanded(
@@ -101,32 +105,11 @@ class NewNoteState extends State<NewNote> {
     return NotusDocument.fromDelta(delta);
   }
 
-  void _saveDocument(BuildContext context){
+  void _saveDocument(BuildContext context) async{
     final contents = jsonEncode(_controller.document);
-    Toast.show(contents, context, duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
-
-
-
+    Toast.show(_title, context, duration: Toast.LENGTH_LONG, gravity: Toast.TOP);
+    final note = await  Note.withFields(_title, contents, null, false, DateTime.now(), DateTime.now(), false).save();
+    Toast.show(note.toString(), context);
   }
-
-  final Future<Database> database  = openDatabase(
-    join(, 'my_note.db'),
-  );
-}
-
-
-
-class Note {
-  final int id;
-  final String title;
-  final String data;
-  final bool favourite;
-  final BigInt syncId;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-
-  Note(this.id, this.title, this.data, this.favourite, this.syncId,
-      this.createdAt, this.updatedAt);
-
 
 }

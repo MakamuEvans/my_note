@@ -25,12 +25,16 @@ dependencies:
   cupertino_icons: ^0.1.2
   toast: ^0.1.5
   zefyr: 0.8.0
-  sqflite: ^1.1.8
-  path_provider: 1.5.0
+  sqfentity: any
+  sqfentity_gen: any
+  intl: 0.16.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner:
+  build_verify:
+
 
 
 # For information on the generic Dart part of this file, see the
